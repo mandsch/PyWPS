@@ -59,7 +59,7 @@ def handler(req):
 
     # set PYWPS_CFG and PYWPS_PROCESSES environment variable, which can not
     # bee seen from mod_python
-    env_vars = req.subprocess_env.copy()
+    env_vars = req.get_options()
     if env_vars.has_key("PYWPS_CFG"):
         os.environ["PYWPS_CFG"] = env_vars["PYWPS_CFG"]
     if env_vars.has_key("PYWPS_PROCESSES"):
@@ -72,7 +72,7 @@ def handler(req):
             pywps.debug(wps.inputs)
             wps.performRequest()
             pywps.response.response(wps.response, req,
-                    wps.parser.isSoap, self.wps.parser.isSoapExecute,contentType = wps.request.contentType)
+                    wps.parser.isSoap, wps.parser.isSoapExecute,contentType = wps.request.contentType)
             return apache.OK
     except WPSException,e:
         pywps.response.response(e, req) 
