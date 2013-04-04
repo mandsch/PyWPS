@@ -9,6 +9,16 @@ PyWPS wsgi script
     PythonPath "sys.path+['/usr/local/pywps-VERSION/']"
     PythonAutoReload On
 
+for mod_wsgi:
+    SetEnv PYWPS_CFG usr/local/wps/pywps.cfg
+    SetEnv PYWPS_PROCESSES /usr/local/wps/processes/
+    SetEnv PYTHONPATH "/usr/local/pywps-VERSION/"
+    <Directory /srv/www/wsgi-scripts/>
+        Order allow,deny
+        Allow from all
+    </Directory>
+    WSGIScriptAlias /wpswsgi /srv/www/wsgi-scripts/wsgiwps.py
+
 .. moduleauthor: Jachym Cepicky jachym bnhelp cz
 """
 
@@ -32,18 +42,21 @@ PyWPS wsgi script
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-import sys
-
-sys.path.append("/home/jachym/usr/src/pywps/trunk/")
+import sys, os
 
 import pywps
 from pywps.Exceptions import *
 
-def dispatchWps(environ, start_response):
+def application(environ, start_response):
 
     status = '200 OK'
     response_headers = [('Content-type','text/xml')]
     start_response(status, response_headers)
+
+    if "PYWPS_PROCESSES" in environ:
+        os.environ["PYWPS_PROCESSES"] = environ["PYWPS_PROCESSES"]
+    if "PYWPS_CFG" in environ:
+        os.environ["PYWPS_CFG"] = environ["PYWPS_CFG"]
 
     inputQuery = None
     if "REQUEST_METHOD" in environ and environ["REQUEST_METHOD"] == "GET":
@@ -82,5 +95,5 @@ if __name__ == '__main__':
         )[0],"tests","processes")
 
     from wsgiref.simple_server import make_server
-    srv = make_server('localhost', 8081, dispatchWps)
+    srv = make_server('localhost', 8081, application)
     srv.serve_forever()
