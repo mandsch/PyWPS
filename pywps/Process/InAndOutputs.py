@@ -197,7 +197,7 @@ class LiteralInput(Input):
 
     dataType = None
     uoms = None
-    restrictedCharacters = ['\\',"#",";", "&","!"]
+    restrictedCharacters = ['\\',"#","&","!"]
     values = None
     default = None
     spacing = None
@@ -212,7 +212,7 @@ class LiteralInput(Input):
         
         self.dataType = dataType
         self.uoms = uoms
-        self.restrictedCharacters = ['\\',"#",";", "&","!"]
+        self.restrictedCharacters = ['\\',"#","&","!"]
         if type(values) == types.StringType:
             self.values = (values)
         elif type(values) == types.ListType:
